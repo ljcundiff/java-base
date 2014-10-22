@@ -1,0 +1,52 @@
+apply plugin: 'java'
+apply plugin:'application'
+
+sourceCompatibility = 1.8
+version = '1.0'
+defaultTasks 'dist'
+mainClassName = "com.artifylabs.app.Main"
+applicationName = "app"
+
+sourceSets {
+    main {
+        java {
+            srcDir 'src'
+        }
+        resources {
+            srcDir 'resources'
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'log4j:log4j:1.2.17'
+    compile 'org.eclipse.jetty.aggregate:jetty-all:9.3.0.M0'
+
+    runtime 'org.slf4j:slf4j-api:1.7.7'
+    runtime 'org.slf4j:slf4j-log4j12:1.7.7'
+    runtime 'org.slf4j:jcl-over-slf4j:1.7.7'
+}
+
+configurations.all {
+    exclude group: 'commons-logging' // exclude because we replace commons logging with jcl over slf4j
+}
+
+run {
+    if (System.getProperty('DEBUG', 'false') == 'true') {
+        debug true
+    }
+}
+
+applicationDistribution.from("conf") {
+    into "conf"
+}
+
+task stage(dependsOn: [clean, installApp])
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.1'
+}
